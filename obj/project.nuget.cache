@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "yqANxvHGAYbxwvF+/g6bs1CyMS1hgiflN2Gb/gc85hStEq3bQr0cRmw1BMW0ciPPzEy3D7P0JeWbW+/b6rqK/Q==",
+  "dgSpecHash": "q5Afz+FDAAX2+icO5RVtJ2YU869p7q3cuHB4Z3p3ppKOSM/wVPzrGtln0Tybeb50uaYFkf7LctqBQlfXY6fERw==",
   "success": true,
   "projectFilePath": "C:\\Users\\LATITUDE E6440\\Documents\\Curso_CDIS\\BankAPI\\BankAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
+    "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.11\\microsoft.aspnetcore.authentication.jwtbearer.7.0.11.nupkg.sha512",
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.7\\microsoft.aspnetcore.openapi.7.0.7.nupkg.sha512",
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "C:\\Users\\LATITUDE E6440\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",

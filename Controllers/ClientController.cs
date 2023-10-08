@@ -1,19 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using BankAPI.Services;
 using BankAPI.Data.BankModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BankAPI.Controllers;
 
+[Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ClientController : ControllerBase {
 
     private readonly ClientService _service;
     public ClientController(ClientService service) => _service = service;
 
-    [HttpGet]
+    [Authorize(Policy = "ViewerAdmin")]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpGet("all")]
     public async Task<IEnumerable<Client>> GetClients() => await _service.GetAll();
 
+    [Authorize(Policy = "ViewerAdmin")]
+    [Authorize(Policy = "SuperAdmin")]
     [HttpGet("{id}")]
     public async Task<ActionResult<Client>> GetById(int id) {
         
@@ -29,7 +35,8 @@ public class ClientController : ControllerBase {
 
     }
 
-    [HttpPost]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpPost("create")]
     public async Task<IActionResult> Create(Client client) {
 
         var newClient = await _service.Create(client);
@@ -37,7 +44,8 @@ public class ClientController : ControllerBase {
         return CreatedAtAction(nameof(GetById), new { id = newClient.Id }, newClient);
     }
     
-    [HttpPut("{id}")]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpPut("modify/{id}")]
     public async Task<IActionResult> UpdateClient(int id, Client client) {
         
         if (!id.Equals(client.Id)) 
@@ -58,7 +66,8 @@ public class ClientController : ControllerBase {
 
     }
 
-    [HttpDelete("{id}")]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteClient(int id) {
 
         var clientToDelete = await _service.GetById(id);

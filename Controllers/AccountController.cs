@@ -1,11 +1,14 @@
 using BankAPI.Data.BankModels;
 using BankAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using BankAPI.Data.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BankAPI.Controllers;
 
+[Authorize]
 [ApiController]
-[Route("[Controller]")]
+[Route("api/[Controller]")]
 public class AccountController : ControllerBase {
     
     private readonly AccountService _service;
@@ -15,13 +18,17 @@ public class AccountController : ControllerBase {
         _clientSevice = clientService;
     }
 
-    [HttpGet]
-    public async Task<IEnumerable<Account>> GetAll() => await _service.GetAll();
+    [Authorize(Policy = "ViewerAdmin")]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpGet("all")]
+    public async Task<IEnumerable<AccountDToOut>> GetAll() => await _service.GetAll();
 
+    [Authorize(Policy = "ViewerAdmin")]
+    [Authorize(Policy = "SuperAdmin")]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Account>> GetById(int id) {
+    public async Task<ActionResult<AccountDToOut>> GetById(int id) {
 
-        var match = await _service.GetById(id);
+        var match = await _service.GetDtoById(id);
 
         if (match is null) {
 
@@ -33,15 +40,14 @@ public class AccountController : ControllerBase {
 
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create(Account account) {
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpPost("create")]
+    public async Task<IActionResult> Create(AccountDToIn account) {
 
         if (account.ClientId is not null) {
 
-            int id = (int)account.ClientId;
-
-            if (await _clientSevice.GetById(id) is null) {
-                return BadRequest( new { message = $"El ID del cliente {id} no existe!" } );
+            if (!await ValidateClientID((int)account.ClientId)) {
+                return BadRequest( new { message = $"El cliente con el id {(int)account.ClientId} no existe"} );
             }
 
         }
@@ -52,19 +58,20 @@ public class AccountController : ControllerBase {
 
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult> Update (int id, Account account) {
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpPut("modify/{id}")]
+    public async Task<ActionResult> Update (int id, AccountDToIn account) {
 
         if (!id.Equals(account.Id)) 
             return BadRequest( new { message = $"El ID {id} no coincide con el ID {account.Id} del cuerpo de la solicitud." } );
 
-	if (account.ClientId is not null) {
-	  
-	  int cId = (int)account.ClientId;
-	  var clientMatch = await _clientSevice.GetById(cId);
-	  if (clientMatch is null) return BadRequest( new { message = $"El cliente con el id {cId} no existe" } );
+        if (account.ClientId is not null) {
 
-	}
+            if (!await ValidateClientID((int)account.ClientId)) {
+                return BadRequest( new { message = $"El cliente con el id {(int)account.ClientId} no existe"} );
+            }
+
+        }
 
         var match = await _service.GetById(id);
 
@@ -79,7 +86,8 @@ public class AccountController : ControllerBase {
 
     }
 
-    [HttpDelete("{id}")]
+    [Authorize(Policy = "SuperAdmin")]
+    [HttpDelete("delete/{id}")]
     public async Task<ActionResult> Delete(int id) {
 
         var match = await _service.GetById(id);
@@ -96,5 +104,12 @@ public class AccountController : ControllerBase {
     }
 
     public NotFoundObjectResult AccountNotFound(int id) => NotFound( new { message = $"La cuenta con el ID {id} no existe." } );
+
+    public async Task<bool> ValidateClientID(int id) {
+
+        var match = await _clientSevice.GetById(id);
+        return match is not null;
+
+    }
 
 }

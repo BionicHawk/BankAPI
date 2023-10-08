@@ -21,7 +21,7 @@ public partial class Account
 
     [JsonIgnore]
     public virtual ICollection<BankTransaction> BankTransactions { get; set; } = new List<BankTransaction>();
-
+    
     [JsonIgnore]
     public virtual Client? Client { get; set; }
 }

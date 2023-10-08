@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BankAPI.Data.BankModels;
 using BankAPI.Data;
+using BankAPI.Data.DTOs;
 
 namespace BankAPI.Services;
 
@@ -10,19 +11,47 @@ public class AccountService {
 
     public AccountService(BankContext context) => _context = context;
 
-    public async Task<IEnumerable<Account>> GetAll() => await _context.Accounts.ToListAsync();
+    public async Task<IEnumerable<AccountDToOut>> GetAll() {
+        return await _context.Accounts.Select(a => new AccountDToOut{
+            Id = a.Id,
+            AccountName = a.AccountTypeNavigation != null? a.AccountTypeNavigation.Name : "",
+            ClientName = a.Client != null?  a.Client.Name : "",
+            Balance = a.Balance,
+            RegDate = a.RegDate,
+        }).ToListAsync();
+    }
+
+    public async Task<AccountDToOut?> GetDtoById(int id) {
+        return await _context.Accounts
+            .Where(a => a.Id == id)
+            .Select(a => new AccountDToOut
+        {
+            Id = a.Id,
+            AccountName = a.AccountTypeNavigation != null? a.AccountTypeNavigation.Name : "",
+            ClientName = a.Client != null?  a.Client.Name : "",
+            Balance = a.Balance,
+            RegDate = a.RegDate,
+        }).SingleOrDefaultAsync();
+    }
 
     public async Task<Account?> GetById(int id) => await _context.Accounts.FindAsync(id);
 
-    public async Task<Account> Create(Account newAccount) {
+    public async Task<Account> Create(AccountDToIn newAccount) {
 
-        _context.Accounts.Add(newAccount);
+        var account = new Account()
+        {
+            AccountType = newAccount.AccountType,
+            ClientId = newAccount.ClientId,
+            Balance = newAccount.Balance
+        };
+
+        _context.Accounts.Add(account);
         await _context.SaveChangesAsync();
 
-        return newAccount;
+        return account;
     }
 
-    public async Task Update(int id, Account account) {
+    public async Task Update(int id, AccountDToIn account) {
 
         var accountToUpdate = await GetById(id);
 

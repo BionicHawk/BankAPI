@@ -20,6 +20,10 @@ public partial class BankContext : DbContext
 
     public virtual DbSet<AccountType> AccountTypes { get; set; }
 
+    public virtual DbSet<AdminType> AdminTypes { get; set; }
+
+    public virtual DbSet<Administrator> Administrators { get; set; }
+
     public virtual DbSet<BankTransaction> BankTransactions { get; set; }
 
     public virtual DbSet<Client> Clients { get; set; }
@@ -65,6 +69,47 @@ public partial class BankContext : DbContext
                 .HasColumnType("datetime");
         });
 
+        modelBuilder.Entity<AdminType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__AdminTyp__3214EC2747BC1657");
+
+            entity.ToTable("AdminType");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Administrator>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Administ__3214EC27ECAE1A50");
+
+            entity.ToTable("Administrator");
+
+            entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(40)
+                .IsUnicode(false);
+            entity.Property(e => e.Pwd)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.RegDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.AdminTypeNavigation).WithMany(p => p.Administrators)
+                .HasForeignKey(d => d.AdminType)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Administr__Admin__3D2915A8");
+        });
+
         modelBuilder.Entity<BankTransaction>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__BankTran__3214EC2708D17360");
@@ -107,6 +152,9 @@ public partial class BankContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(40)
+                .IsUnicode(false);
+            entity.Property(e => e.Pwd)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.RegDate)
                 .HasDefaultValueSql("(getdate())")
